@@ -4,8 +4,15 @@ import { Ranking } from "./ranking";
 import { Status } from "./status";
 import { InviteLinkInput } from "./inviteLinkInput";
 
-export default function Invite() {
-  const inviteLink = "https://matheustiburcio.vercel.app";
+type InvitePageProps = {
+  params: Promise<{
+    subscriberId: string;
+  }>;
+};
+
+export default async function Invite(props: InvitePageProps) {
+  const { subscriberId } = await props.params;
+  const inviteLink = `http://localhost:3333/invites/${subscriberId}`;
 
   return (
     <div className="flex min-h-dvh flex-col items-center justify-between gap-16 md:flex-row">
@@ -35,7 +42,7 @@ export default function Invite() {
 
           <InviteLinkInput inviteLink={inviteLink} />
 
-          <Status />
+          <Status subscriberId={subscriberId} />
         </div>
       </div>
 

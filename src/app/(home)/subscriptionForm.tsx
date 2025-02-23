@@ -2,7 +2,9 @@
 
 import { Button } from "@/components/button";
 import { InputRoot, InputIcon, InputField } from "@/components/input";
+import { subscribeToEvent } from "@/http/api";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { LuUser, LuMail, LuArrowRight } from "react-icons/lu";
 import { z } from "zod";
@@ -11,9 +13,10 @@ const subscriptionSchema = z.object({
   name: z.string().min(2, "Digite seu nome completo"),
   email: z.string().email("Digite um e-mail válido"),
 });
-
 type SubscriptionSchema = z.infer<typeof subscriptionSchema>;
 export function SubscriptionForm() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const {
     register,
     handleSubmit,
@@ -22,9 +25,15 @@ export function SubscriptionForm() {
     resolver: zodResolver(subscriptionSchema),
   });
 
+  async function onSubscribe({ name, email }: SubscriptionSchema) {
+    const referrer = searchParams.get("referrer");
+    const { subscriberId } = await subscribeToEvent({ name, email, referrer });
+    router.push(`invite/${subscriberId}`);
+  }
+
   return (
     <form
-      onSubmit={handleSubmit((data: SubscriptionSchema) => console.log(data))}
+      onSubmit={handleSubmit(onSubscribe)}
       className="w-full space-y-6 rounded-2xl border border-gray-600 bg-gray-700 p-8 md:max-w-[440px]"
     >
       <h2 className="font-heading text-xl font-semibold text-gray-200">
